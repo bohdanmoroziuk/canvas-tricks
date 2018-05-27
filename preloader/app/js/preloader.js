@@ -44,22 +44,17 @@
     };
 
     class Circle {
-        constructor(canvas, x, y) {
+        constructor(canvas, x, y, settings) {
             this.reverse    = false;
             this.angle      = 0;
-            this.speed      = 0.05;
-            this.radius     = 77;
-            this.thickness  = 5;
             this.canvas     = canvas;
-            this.color      = 'crimson';
-            this.style      = 'round';
-            this.width      = 7;
             this.x          = x;
             this.y          = y;
+            this.settings   = settings; 
         };
 
         update() {
-            this.angle      += this.speed;
+            this.angle      += this.settings.speed;
 
             if (this.angle > Math.PI * 2) {
                 this.angle      = 0;
@@ -67,33 +62,56 @@
             };
         };
 
+        inform() {
+            let value                   = parseInt((this.angle * 100) / (Math.PI * 2), 10);
+
+            this.canvas.font            = this.settings.font;
+            this.canvas.fillStyle       = this.settings.color;
+            this.canvas.textAlign       = 'center';
+            this.canvas.textBaseline    = 'middle';
+
+            this.canvas.fillText(`${value}%`, this.x, this.y);
+        };
+
         draw() {
             this.update();
+
+            console.log(`angle ${this.angle}`);
 
             this.canvas.beginPath();
 
             this.reverse 
-                ? this.canvas.arc(this.x, this.y, this.radius, 0, this.angle)
-                : this.canvas.arc(this.x, this.y, this.radius, this.angle, Math.PI * 2);
-           
-            this.canvas.strokeStyle  = this.color;
+                ? this.canvas.arc(this.x, this.y, this.settings.radius, 0, this.angle)
+                : this.canvas.arc(this.x, this.y, this.settings.radius, this.angle, Math.PI * 2);
+
+            this.canvas.strokeStyle     = this.settings.color;
             this.canvas.stroke();
-            this.canvas.lineWidth    = this.width;
-            this.canvas.lineCap      = this.style;
+            this.canvas.lineWidth       = this.settings.width;
+            this.canvas.lineCap         = this.settings.style;
             this.canvas.closePath();
         };
     };
 
     function draw() {
         canvas.fill();
+        
         circle.draw();
+        circle.inform();
 
         requestAnimationFrame(draw);
     };
 
     function init() {
         canvas = new Canvas('preloader', '#222');
-        circle = new Circle(canvas.get, canvas.center.x, canvas.center.y);
+        circle = new Circle(canvas.get, canvas.center.x, canvas.center.y, {
+            speed       : 0.02,
+            radius      : 77,
+            thickness   : 5,
+            color       : 'crimson',
+            style       : 'round',
+            width       : 7,
+            font        : '30px Arial'
+        });
 
         requestAnimationFrame(draw);
     };
